@@ -1,0 +1,526 @@
+
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ModelLab | Regression Explained</title>
+
+  <style>
+    :root {
+      --bg: #f5f7ff;
+      --fg: #17213b;
+      --muted: #66738d;
+      --line: #e1e6f2;
+      --accent: #6254e8;
+      --up: #e16a42;
+      --down: #168c9a;
+      --card: #ffffff;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--fg);
+      font: 16px/1.6 system-ui, -apple-system, sans-serif;
+    }
+
+    header {
+      background: #ffffff;
+      border-bottom: 1px solid var(--line);
+      padding: 28px max(24px, calc((100% - 1100px) / 2));
+    }
+
+    header h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 800;
+      letter-spacing: -1.2px;
+      color: var(--accent);
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 4px 0 24px;
+    }
+
+    nav {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    nav a {
+      text-decoration: none;
+      color: var(--muted);
+      background: var(--bg);
+      border: 1px solid var(--line);
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 650;
+      transition: 0.2s;
+    }
+
+    nav a:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+      transform: translateY(-2px);
+    }
+
+    nav a.active {
+      background: var(--accent);
+      color: white;
+      border-color: var(--accent);
+      box-shadow: 0 5px 14px #6254e82b;
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 18px;
+      padding: 20px;
+      border-radius: 16px;
+      background: var(--bg);
+      border: 1px solid var(--line);
+    }
+
+    .controls label {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-weight: 650;
+      font-size: 14px;
+    }
+
+    select, input {
+      font: inherit;
+      padding: 10px 12px;
+      background: white;
+      color: var(--fg);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      max-width: 100%;
+    }
+
+    select:focus, input:focus {
+      outline: 2px solid var(--accent);
+      outline-offset: 2px;
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+      width: min(100%, 420px);
+      cursor: pointer;
+    }
+
+    main {
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 24px 60px;
+      animation: appear 0.3s ease;
+    }
+
+    main h2 {
+      font-size: clamp(25px, 4vw, 34px);
+      line-height: 1.25;
+      letter-spacing: -0.8px;
+      margin-top: 0;
+    }
+
+    .starter {
+      background: #f0edff;
+      border: 1px solid #ded8ff;
+      color: #5142a8;
+      padding: 14px 18px;
+      border-radius: 12px;
+    }
+
+    .inputs {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .inputs label {
+      display: flex;
+      flex-direction: column;
+      gap: 7px;
+      background: white;
+      padding: 16px;
+      border-radius: 14px;
+      border: 1px solid var(--line);
+      font-size: 14px;
+      font-weight: 650;
+    }
+
+    table {
+      border-collapse: separate;
+      border-spacing: 0;
+      width: 100%;
+      margin: 22px 0;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    td, th {
+      border-bottom: 1px solid var(--line);
+      padding: 14px 18px;
+      text-align: left;
+    }
+
+    tr:last-child td,
+    tr:last-child th {
+      border-bottom: 0;
+    }
+
+    th {
+      background: #f0edff;
+    }
+
+    td.num, th.num {
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+      font-weight: 700;
+    }
+
+    .up {
+      color: var(--up);
+    }
+
+    .down {
+      color: var(--down);
+    }
+
+    .note {
+      color: var(--muted);
+      font-size: 14px;
+      background: white;
+      border-left: 4px solid var(--accent);
+      padding: 16px 20px;
+      border-radius: 0 12px 12px 0;
+      margin-top: 24px;
+    }
+
+    #forest-results,
+    #boosting-results {
+      margin-top: 24px;
+    }
+
+    svg {
+      display: block;
+      width: 100%;
+      height: auto;
+      margin: 20px 0;
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px;
+    }
+
+    /* =========================================
+       PUSH & PULL — INTERACTIVE LESSON
+       ========================================= */
+
+    .lesson-intro {
+      margin-bottom: 28px;
+    }
+
+    .lesson-intro h2 {
+      margin: 8px 0;
+    }
+
+    .lesson-intro > p {
+      color: var(--muted);
+      max-width: 720px;
+      font-size: 17px;
+    }
+
+    .lesson-tag {
+      display: inline-block;
+      background: #ebe7ff;
+      color: #5142b5;
+      padding: 6px 12px;
+      border-radius: 30px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 1px;
+    }
+
+    .lesson-card {
+      background: white;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      padding: 26px;
+      margin-bottom: 22px;
+      box-shadow: 0 5px 22px rgba(32, 44, 91, 0.04);
+    }
+
+    .lesson-card h3 {
+      margin-top: 0;
+      font-size: 21px;
+    }
+
+    .lesson-button {
+      background: var(--accent);
+      color: white;
+      border: 0;
+      border-radius: 10px;
+      padding: 11px 17px;
+      cursor: pointer;
+      font: inherit;
+      font-weight: 700;
+      transition: 0.2s;
+    }
+
+    .lesson-button:hover {
+      filter: brightness(1.1);
+      transform: translateY(-1px);
+    }
+
+    /* Starting point + pushes = prediction */
+
+    .prediction-summary {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      margin: 25px 0 35px;
+    }
+
+    .summary-box {
+      flex: 1;
+      min-width: 150px;
+      padding: 20px;
+      border-radius: 15px;
+      background: #f5f6fc;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .summary-box small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+    }
+
+    .summary-box strong {
+      font-size: clamp(23px, 3vw, 34px);
+      letter-spacing: -1px;
+    }
+
+    .summary-box span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .summary-box.final {
+      background: var(--accent);
+      color: white;
+    }
+
+    .summary-box.final small,
+    .summary-box.final span {
+      color: #e0dcff;
+    }
+
+    .summary-symbol {
+      font-size: 27px;
+      font-weight: 800;
+      color: var(--muted);
+    }
+
+    /* Positive and negative contribution bars */
+
+    .push-chart {
+      margin: 25px 0;
+    }
+
+    .push-row {
+      margin-bottom: 19px;
+    }
+
+    .push-heading {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+      margin-bottom: 7px;
+      font-size: 14px;
+    }
+
+    .push-track {
+      display: flex;
+      height: 16px;
+      border-radius: 8px;
+      overflow: hidden;
+      background: #f1f3f8;
+    }
+
+    .push-half {
+      width: 50%;
+      display: flex;
+      align-items: stretch;
+    }
+
+    .push-half.left {
+      justify-content: flex-end;
+      border-right: 2px solid #8792aa;
+    }
+
+    .push-half.right {
+      justify-content: flex-start;
+    }
+
+    .push-fill {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+
+    .push-fill.positive {
+      background: var(--up);
+      border-radius: 0 8px 8px 0;
+    }
+
+    .push-fill.negative {
+      background: var(--down);
+      border-radius: 8px 0 0 8px;
+    }
+
+    /* Formula and coefficient explanation */
+
+    .formula {
+      padding: 16px;
+      border-radius: 12px;
+      background: #f0edff;
+      color: #5142a8;
+      font-weight: 750;
+      text-align: center;
+    }
+
+    .example-explanation {
+      background: #f5f7ff;
+      padding: 18px;
+      border-radius: 12px;
+      margin: 18px 0;
+    }
+
+    /* Interactive knowledge check */
+
+    .takeaway {
+      border: 2px solid var(--accent);
+    }
+
+    #answer-box {
+      background: #f0edff;
+      padding: 14px 18px;
+      border-radius: 12px;
+      margin-top: 16px;
+    }
+
+    #answer-box[hidden] {
+      display: none;
+    }
+
+    @keyframes appear {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    @media (max-width: 600px) {
+      header {
+        padding: 24px 18px;
+      }
+
+      nav {
+        flex-direction: column;
+      }
+
+      nav a {
+        text-align: center;
+      }
+
+      main {
+        padding: 0 16px 40px;
+      }
+
+      .controls {
+        flex-direction: column;
+      }
+
+      td, th {
+        padding: 10px;
+        font-size: 13px;
+      }
+
+      .lesson-card {
+        padding: 18px;
+      }
+
+      .prediction-summary {
+        gap: 8px;
+      }
+
+      .summary-symbol {
+        font-size: 18px;
+      }
+
+      .summary-box {
+        min-width: 120px;
+      }
+
+      .push-heading {
+        font-size: 12px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>✦ ModelLab</h1>
+
+    <p class="subtitle">
+      Three regression algorithms. Three interactive experiments.
+      See how predictions really work.
+    </p>
+
+    <nav aria-label="Model sections">
+      <a href="#linear">↗ Push &amp; Pull</a>
+      <a href="#forest">♧ Wisdom of the Forest</a>
+      <a href="#boosting">⚡ One Correction at a Time</a>
+    </nav>
+
+    <div class="controls">
+      <label>
+        Explore a health dataset
+        <select id="dataset"></select>
+      </label>
+
+      <label>
+        Choose a real survey participant
+        <select id="person"></select>
+      </label>
+    </div>
+  </header>
+
+  <main id="section"></main>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>
