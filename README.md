@@ -1,28 +1,47 @@
-# Explain the Model
+# ✦ ModelLab — Explain the Model
 
-**App:** _paste your public app link here_
+**Live App:** https://harrisonf7.github.io/modellab-regression/
+
+An interactive learning app that explains three regression algorithms using real NHANES health data: fasting glucose, blood pressure, and lung function.
+
+## Explore the Three Models
 
 | Section | Direct link | My viewer should walk away knowing… |
 |---|---|---|
-| Push & Pull (linear regression) | _link_ | _one sentence_ |
-| Wisdom of the Forest (random forest) | _link_ | _one sentence_ |
-| One Correction at a Time (gradient boosting) | _link_ | _one sentence_ |
+| Push & Pull (Linear Regression) | [Explore Linear Regression](https://harrisonf7.github.io/modellab-regression/#linear) | How a linear regression model starts with a baseline prediction and adds individual feature contributions to produce its final prediction. |
+| Wisdom of the Forest (Random Forest) | [Explore Random Forest](https://harrisonf7.github.io/modellab-regression/#forest) | How multiple decision trees make different predictions and how averaging their outputs creates a more stable prediction. |
+| One Correction at a Time (Gradient Boosting) | [Explore Gradient Boosting](https://harrisonf7.github.io/modellab-regression/#boosting) | How trees sequentially correct prediction errors and why validation performance helps determine when to stop adding trees. |
 
-An app that explains three regression models to an anonymous visitor who knows about machine learning and regression, but not how these algorithms work. Datasets: NHANES fasting glucose, blood pressure and lung function.
+## About ModelLab
 
-Submit the link to **this repository** on Canvas. Reviewers open the app link above.
+ModelLab teaches machine learning concepts through interactive experiments.
 
-## What's here
-| File | What it is |
-|---|---|
-| `AGENT_BRIEF.md` | Rules for your AI coding agent (have it read this first) |
-| `SETUP.md` | How to run and publish (GitHub Pages or Streamlit) |
-| `check.md` | Numbers your finished app must still show |
-| `index.html`, `app.js`, `m10.js` | GitHub Pages route |
-| `streamlit_app.py`, `m10.py`, `requirements.txt` | Streamlit route |
-| `outputs/` | Reference model outputs (field guide: `outputs/SCHEMA.md`) |
-| `data/` | The three datasets and the data dictionary |
+Visitors can explore three real health datasets, examine different participants, and interact with each algorithm to understand how its predictions are constructed.
 
-## Run locally
-- GitHub Pages route: `python -m http.server 8000`, then open <http://localhost:8000>
-- Streamlit route: `uv run --with streamlit,pandas,numpy streamlit run streamlit_app.py`
+The app includes interactive visualizations, explanations, and knowledge checks.
+
+## Run Locally
+
+From the project directory:
+
+```bash
+python3 -m http.server 8000
+```
+
+Then open http://localhost:8000 in your browser.
+
+## Project Files
+
+- `index.html` — Website structure and styling
+- `app.js` — Interactive learning sections
+- `m10.js` — Model calculations and data loading
+- `outputs/` — Precomputed model outputs
+- `data/` — NHANES health datasets
+- `AGENT_BRIEF.md` — Original project instructions
+- `check.md` — Reference values for validating the app
+
+## Submission
+
+Submit this GitHub repository link on Canvas:
+
+https://github.com/HarrisonF7/modellab-regression
